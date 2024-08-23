@@ -21,5 +21,6 @@ db.sequelize = sequelize;
 
 // table
 db.sa = require("../models/sa.model.js")(sequelize, Sequelize);
+db.kamar = require("../models/kamar.model.js")(sequelize, Sequelize);
 
 module.exports = db;
