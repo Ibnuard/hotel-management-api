@@ -23,5 +23,6 @@ db.sequelize = sequelize;
 db.sa = require("../models/sa.model.js")(sequelize, Sequelize);
 db.kamar = require("../models/kamar.model.js")(sequelize, Sequelize);
 db.tamu = require("../models/tamu.model.js")(sequelize, Sequelize);
+db.tipe_kamar = require("../models/tipe.model.js")(sequelize, Sequelize);
 
 module.exports = db;
