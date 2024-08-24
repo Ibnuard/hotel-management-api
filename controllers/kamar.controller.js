@@ -110,7 +110,7 @@ exports.get_all_kamar = async (req, res) => {
       data: result.rows,
       pagination: {
         totalItems: result.count,
-        totalPages: totalPages,
+        totalPages: totalPages !== 0 ? totalPages : 1,
         currentPage: parseInt(page),
         itemsPerPage: parseInt(limit),
       },
@@ -176,11 +176,46 @@ exports.get_ready_kamar = async (req, res) => {
       data: result.rows,
       pagination: {
         totalItems: result.count,
-        totalPages: totalPages,
+        totalPages: totalPages !== 0 ? totalPages : 1,
         currentPage: parseInt(page),
         itemsPerPage: parseInt(limit),
       },
     });
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.get_kamar_stats = async (req, res) => {
+  try {
+    const kamarReady = await kamar_db.findAndCountAll({
+      where: {
+        is_tersedia: true,
+        in_use: false,
+      },
+    });
+
+    const kamarUsed = await kamar_db.findAndCountAll({
+      where: {
+        is_tersedia: true,
+        in_use: true,
+      },
+    });
+
+    const kamarUnready = await kamar_db.findAndCountAll({
+      where: {
+        is_tersedia: false,
+        in_use: false,
+      },
+    });
+
+    Resp(res, "OK", "Success!", {
+      ready: kamarReady.count,
+      unready: kamarUnready.count,
+      used: kamarUsed.count,
+    });
+    return;
   } catch (error) {
     Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
     return;

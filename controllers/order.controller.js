@@ -44,7 +44,7 @@ exports.checkin_order = async (req, res) => {
       status_order: "CHECKED_IN",
     });
 
-    await kamar_db.update({ is_tersedia: false }, { where: { id: kamar_id } });
+    await kamar_db.update({ in_use: true }, { where: { id: kamar_id } });
 
     Resp(res, "OK", "Success!", { success: true });
     return;
@@ -115,7 +115,7 @@ exports.get_checkout_kamar = async (req, res) => {
       data: result.rows,
       pagination: {
         totalItems: result.count,
-        totalPages: totalPages,
+        totalPages: totalPages !== 0 ? totalPages : 1,
         currentPage: parseInt(page),
         itemsPerPage: parseInt(limit),
       },
@@ -183,6 +183,91 @@ exports.get_order_detail = async (req, res) => {
       deposit: deposit,
       grandTotal: grandTotal,
     });
+    return;
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.checkout_kamar = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const getOrder = await order_db.findOne({
+      where: { id: id },
+      include: [
+        {
+          model: kamar_db,
+          as: "kamar",
+          required: false,
+        },
+        {
+          model: tamu_db,
+          as: "tamu",
+          required: false,
+        },
+      ],
+    });
+    const getOrderData = await getOrder["dataValues"];
+    const kamarId = getOrderData.kamar.id;
+
+    await order_db.update(
+      { status_order: "CHECKED_OUT" },
+      { where: { id: id } }
+    );
+
+    await kamar_db.update({ in_use: false }, { where: { id: kamarId } });
+
+    Resp(res, "OK", "success!", { success: true });
+    return;
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.update_order = async (req, res) => {
+  const {
+    jumlah_dewasa,
+    jumlah_anak,
+    jumlah_deposit,
+    tgl_checkout,
+    waktu_checkout,
+  } = req.body;
+
+  const { id } = req.params;
+  try {
+    await order_db.update(
+      {
+        jumlah_dewasa,
+        jumlah_anak,
+        jumlah_deposit,
+        tgl_checkout,
+        waktu_checkout,
+      },
+      { where: { id: id } }
+    );
+
+    Resp(res, "OK", "Success!", { success: true });
+    return;
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.delete_order = async (req, res) => {
+  const { id } = req.params;
+  const { kamarId } = req.query;
+  try {
+    await order_db.destroy({ where: { id: id } });
+
+    await kamar_db.update({ in_use: false }, { where: { id: kamarId } });
+
+    Resp(res, "OK", "Success!", { success: true });
     return;
   } catch (error) {
     console.log(error);

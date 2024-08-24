@@ -123,7 +123,7 @@ exports.get_all_tamu = async (req, res) => {
       data: result.rows,
       pagination: {
         totalItems: result.count,
-        totalPages: totalPages,
+        totalPages: totalPages !== 0 ? totalPages : 1,
         currentPage: parseInt(page),
         itemsPerPage: parseInt(limit),
       },
