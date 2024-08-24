@@ -21,6 +21,9 @@ module.exports = (sequelize, Sequelize) => {
     is_tersedia: {
       type: Sequelize.STRING,
     },
+    in_use: {
+      type: Sequelize.BOOLEAN,
+    },
   });
 
   return Kamar;
