@@ -12,6 +12,7 @@ exports.add_kamar = async (req, res) => {
     tipe_kamar_id,
     max_dewasa,
     max_anak,
+    harga,
     is_tersedia,
   } = req.body;
 
@@ -23,6 +24,7 @@ exports.add_kamar = async (req, res) => {
       max_dewasa: max_dewasa,
       max_anak: max_anak,
       is_tersedia: is_tersedia,
+      harga: harga,
       in_use: false,
     });
 
@@ -41,6 +43,7 @@ exports.edit_kamar = async (req, res) => {
     tipe_kamar_id,
     max_dewasa,
     max_anak,
+    harga,
     is_tersedia,
   } = req.body;
 
@@ -54,6 +57,7 @@ exports.edit_kamar = async (req, res) => {
         tipe_kamar_id: tipe_kamar_id,
         max_dewasa: max_dewasa,
         max_anak: max_anak,
+        harga: harga,
         is_tersedia: is_tersedia,
       },
       {
@@ -158,6 +162,12 @@ exports.get_ready_kamar = async (req, res) => {
       where: whereCondition,
       limit: parseInt(limit),
       offset: parseInt(offset),
+      include: [
+        {
+          model: tipe_kamar_db,
+          as: "tipeKamar", // Sesuaikan dengan alias yang digunakan saat mendefinisikan relasi
+        },
+      ],
     });
 
     const totalPages = Math.ceil(result.count / limit);

@@ -7,6 +7,7 @@ const sa = require("../controllers/sa.controller");
 const kamar = require("../controllers/kamar.controller");
 const tamu = require("../controllers/tamu.controller");
 const tipe_kamar = require("../controllers/tipekamar.controller");
+const order = require("../controllers/order.controller");
 
 // method
 
@@ -33,5 +34,10 @@ router.delete("/admin/tipe/:id", tipe_kamar.delete_tipe_kamar);
 
 // -- checkin
 router.get("/checkin/kamar", kamar.get_ready_kamar);
+router.post("/checkin/create", order.checkin_order);
+
+// -- checkout
+router.get("/checkout/kamar", order.get_checkout_kamar);
+router.get("/checkout/kamar/:id", order.get_order_detail);
 
 module.exports = { router };

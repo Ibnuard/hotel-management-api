@@ -24,6 +24,7 @@ db.sa = require("../models/sa.model.js")(sequelize, Sequelize);
 db.kamar = require("../models/kamar.model.js")(sequelize, Sequelize);
 db.tamu = require("../models/tamu.model.js")(sequelize, Sequelize);
 db.tipe_kamar = require("../models/tipe.model.js")(sequelize, Sequelize);
+db.order = require("../models/order.model.js")(sequelize, Sequelize);
 
 // Setup associations
 Object.keys(db).forEach((modelName) => {

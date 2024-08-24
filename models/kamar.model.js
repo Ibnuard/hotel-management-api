@@ -19,6 +19,9 @@ module.exports = (sequelize, Sequelize) => {
     max_anak: {
       type: Sequelize.INTEGER,
     },
+    harga: {
+      type: Sequelize.STRING,
+    },
     is_tersedia: {
       type: Sequelize.STRING,
     },
