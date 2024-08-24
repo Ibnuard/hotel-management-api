@@ -3,6 +3,7 @@ const db = require("../db");
 const { ERROR_MESSAGE_GENERAL } = require("../utils/Constants");
 const { Resp } = require("../utils/Resp");
 const kamar_db = db.kamar;
+const tipe_kamar_db = db.tipe_kamar;
 
 exports.add_kamar = async (req, res) => {
   const {
@@ -19,10 +20,10 @@ exports.add_kamar = async (req, res) => {
       nama_kamar: nama_kamar,
       nomor_kamar: nomor_kamar,
       tipe_kamar_id: tipe_kamar_id,
-      tipe_kamar: "",
       max_dewasa: max_dewasa,
       max_anak: max_anak,
       is_tersedia: is_tersedia,
+      in_use: false,
     });
 
     Resp(res, "OK", "Success!", { success: true });
@@ -51,7 +52,6 @@ exports.edit_kamar = async (req, res) => {
         nama_kamar: nama_kamar,
         nomor_kamar: nomor_kamar,
         tipe_kamar_id: tipe_kamar_id,
-        tipe_kamar: "",
         max_dewasa: max_dewasa,
         max_anak: max_anak,
         is_tersedia: is_tersedia,
@@ -92,6 +92,12 @@ exports.get_all_kamar = async (req, res) => {
       where: whereCondition,
       limit: parseInt(limit),
       offset: parseInt(offset),
+      include: [
+        {
+          model: tipe_kamar_db,
+          as: "tipeKamar", // Sesuaikan dengan alias yang digunakan saat mendefinisikan relasi
+        },
+      ],
     });
 
     const totalPages = Math.ceil(result.count / limit);
@@ -106,6 +112,7 @@ exports.get_all_kamar = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
     Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
     return;
   }
@@ -136,7 +143,7 @@ exports.get_ready_kamar = async (req, res) => {
     // Build the where condition for a single search query
     const whereCondition = {
       in_use: false,
-      is_tersedia: "1",
+      is_tersedia: 1,
     };
 
     if (cari) {

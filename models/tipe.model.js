@@ -11,5 +11,12 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
+  TipeKamar.associate = (models) => {
+    TipeKamar.hasMany(models.kamar, {
+      foreignKey: "tipe_kamar_id",
+      as: "kamar",
+    });
+  };
+
   return TipeKamar;
 };

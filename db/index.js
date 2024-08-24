@@ -25,4 +25,11 @@ db.kamar = require("../models/kamar.model.js")(sequelize, Sequelize);
 db.tamu = require("../models/tamu.model.js")(sequelize, Sequelize);
 db.tipe_kamar = require("../models/tipe.model.js")(sequelize, Sequelize);
 
+// Setup associations
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
+
 module.exports = db;

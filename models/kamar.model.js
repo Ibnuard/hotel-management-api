@@ -8,9 +8,10 @@ module.exports = (sequelize, Sequelize) => {
     },
     tipe_kamar_id: {
       type: Sequelize.INTEGER,
-    },
-    tipe_kamar: {
-      type: Sequelize.STRING,
+      references: {
+        model: "tipe_kamars", // name of the target model
+        key: "id", // key in the target model that the foreign key is associated with
+      },
     },
     max_dewasa: {
       type: Sequelize.INTEGER,
@@ -25,6 +26,13 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BOOLEAN,
     },
   });
+
+  Kamar.associate = (models) => {
+    Kamar.belongsTo(models.tipe_kamar, {
+      foreignKey: "tipe_kamar_id",
+      as: "tipeKamar",
+    });
+  };
 
   return Kamar;
 };
