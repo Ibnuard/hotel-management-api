@@ -262,3 +262,124 @@ exports.delete_order = async (req, res) => {
     return;
   }
 };
+
+exports.get_history = async (req, res) => {
+  const { page = 1, limit = 10, cari } = req.query;
+
+  try {
+    const offset = (page - 1) * limit;
+
+    // Build the where condition for a single search query
+    // Build the where condition for a single search query
+    const whereCondition = {
+      status_order: "CHECKED_OUT",
+    };
+
+    if (cari) {
+      whereCondition[Op.or] = [
+        { "$kamar.nama_kamar$": { [Op.like]: `%${cari}%` } },
+        { "$kamar.nomor_kamar$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.nama_depan$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.nama_belakang$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.alias$": { [Op.like]: `%${cari}%` } },
+      ];
+    }
+
+    const result = await order_db.findAndCountAll({
+      where: whereCondition,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      include: [
+        {
+          model: kamar_db,
+          as: "kamar",
+          required: true, // Ensure the kamar table is always joined
+        },
+        {
+          model: tamu_db,
+          as: "tamu",
+          required: true, // Ensure the tamu table is always joined
+        },
+      ],
+      subQuery: false,
+    });
+
+    const totalPages = Math.ceil(result.count / limit);
+
+    Resp(res, "OK", "Success!", {
+      data: result.rows,
+      pagination: {
+        totalItems: result.count,
+        totalPages: totalPages !== 0 ? totalPages : 1,
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.get_in_house = async (req, res) => {
+  const { page = 1, limit = 10, cari } = req.query;
+
+  try {
+    const offset = (page - 1) * limit;
+
+    // Build the where condition for a single search query
+    const today = moment().format("YYYY-MM-DD");
+    const whereCondition = {
+      status_order: "CHECKED_IN",
+      tgl_checkout: {
+        [Op.eq]: today,
+      },
+    };
+
+    if (cari) {
+      whereCondition[Op.or] = [
+        { "$kamar.nama_kamar$": { [Op.like]: `%${cari}%` } },
+        { "$kamar.nomor_kamar$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.nama_depan$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.nama_belakang$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.alias$": { [Op.like]: `%${cari}%` } },
+      ];
+    }
+
+    const result = await order_db.findAndCountAll({
+      where: whereCondition,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      include: [
+        {
+          model: kamar_db,
+          as: "kamar",
+          required: true, // Ensure the kamar table is always joined
+        },
+        {
+          model: tamu_db,
+          as: "tamu",
+          required: true, // Ensure the tamu table is always joined
+        },
+      ],
+      subQuery: false,
+    });
+
+    const totalPages = Math.ceil(result.count / limit);
+
+    Resp(res, "OK", "Success!", {
+      data: result.rows,
+      pagination: {
+        totalItems: result.count,
+        totalPages: totalPages !== 0 ? totalPages : 1,
+        currentPage: parseInt(page),
+        itemsPerPage: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};

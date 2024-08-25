@@ -44,4 +44,8 @@ router.get("/checkout/kamar", order.get_checkout_kamar);
 router.get("/checkout/kamar/:id", order.get_order_detail);
 router.post("/checkout/kamar/:id", order.checkout_kamar);
 
+// -- order
+router.get("/order/history", order.get_history);
+router.get("/order/checkout-today", order.get_in_house);
+
 module.exports = { router };
