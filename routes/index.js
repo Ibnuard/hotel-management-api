@@ -1,6 +1,8 @@
 const express = require("express");
+const multer = require("multer");
 
 const router = express.Router();
+const upload = multer();
 
 // controller
 const sa = require("../controllers/sa.controller");
@@ -13,6 +15,8 @@ const order = require("../controllers/order.controller");
 
 // -- sa
 router.post("/admin/login", sa.sa_login);
+router.get("/admin/data", sa.get_sa);
+router.post("/admin/update", sa.update_sa);
 
 // -- kamar
 router.post("/admin/add-kamar", kamar.add_kamar);
@@ -47,5 +51,12 @@ router.post("/checkout/kamar/:id", order.checkout_kamar);
 // -- order
 router.get("/order/history", order.get_history);
 router.get("/order/checkout-today", order.get_in_house);
+
+// -- inv
+router.post(
+  "/order/invoice/send",
+  upload.single("invoice"),
+  order.send_invoice_to_email
+);
 
 module.exports = { router };

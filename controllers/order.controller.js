@@ -1,5 +1,6 @@
-const { Op, col, where, Sequelize } = require("sequelize");
+const { Op } = require("sequelize");
 const db = require("../db");
+const nodemailer = require("nodemailer");
 const { ERROR_MESSAGE_GENERAL } = require("../utils/Constants");
 const { Resp } = require("../utils/Resp");
 const moment = require("moment");
@@ -10,6 +11,7 @@ const {
 const order_db = db.order;
 const kamar_db = db.kamar;
 const tamu_db = db.tamu;
+const sa_db = db.sa;
 const tipe_kamar_db = db.tipe_kamar;
 
 exports.checkin_order = async (req, res) => {
@@ -376,6 +378,65 @@ exports.get_in_house = async (req, res) => {
         currentPage: parseInt(page),
         itemsPerPage: parseInt(limit),
       },
+    });
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.send_invoice_to_email = async (req, res) => {
+  try {
+    const { file } = req;
+    const { inv, receiver } = req.query;
+
+    if (!file) {
+      Resp(res, "ERROR", "Tidak ada file.", []);
+      return;
+    }
+
+    // get param email
+    const getData = await sa_db.findOne({ where: { id: 1 } });
+    const getDataSA = await getData["dataValues"];
+
+    const saEmail = getDataSA.email;
+    const saPW = getDataSA?.email_password;
+
+    console.log(saEmail, saPW);
+
+    // Setup Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: saEmail,
+        pass: saPW,
+      },
+    });
+
+    const mailOptions = {
+      from: saEmail,
+      to: receiver, // Replace with the actual recipient email
+      subject: `Invoice Layanan Anggrek Inn 2 - ${inv}`,
+      text: "Mohon untuk simpan invoice dibawah ini sebagai bukti pembayaran.",
+      attachments: [
+        {
+          filename: file.originalname,
+          content: file.buffer,
+        },
+      ],
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email", error);
+        Resp(res, "ERROR", "Gagal mengirim invoice.", []);
+        return;
+      }
+      console.log("Email sent: " + info.response);
+      Resp(res, "OK", "Success!", { success: true });
+      return;
     });
   } catch (error) {
     console.log(error);

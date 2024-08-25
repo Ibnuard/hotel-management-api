@@ -39,3 +39,34 @@ exports.sa_login = async (req, res) => {
     return;
   }
 };
+
+exports.get_sa = async (req, res) => {
+  try {
+    const getData = await sa_db.findOne({ where: { id: 1 } });
+    const getDataSA = await getData["dataValues"];
+
+    delete getDataSA.password;
+    Resp(res, "OK", "Success!", getDataSA);
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.update_sa = async (req, res) => {
+  const { email, email_password, password } = req.body;
+  try {
+    if (password) {
+      await sa_db.update({ password: md5(password) }, { where: { id: 1 } });
+    }
+
+    await sa_db.update({ email, email_password }, { where: { id: 1 } });
+
+    Resp(res, "OK", "Success!", { success: true });
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};

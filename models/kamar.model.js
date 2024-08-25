@@ -12,6 +12,8 @@ module.exports = (sequelize, Sequelize) => {
         model: "tipe_kamars", // name of the target model
         key: "id", // key in the target model that the foreign key is associated with
       },
+      onDelete: "CASCADE", // Menghapus orders terkait saat kamar dihapus
+      onUpdate: "CASCADE",
     },
     max_dewasa: {
       type: Sequelize.INTEGER,
@@ -34,6 +36,7 @@ module.exports = (sequelize, Sequelize) => {
     Kamar.belongsTo(models.tipe_kamar, {
       foreignKey: "tipe_kamar_id",
       as: "tipeKamar",
+      onDelete: "CASCADE",
     });
   };
 

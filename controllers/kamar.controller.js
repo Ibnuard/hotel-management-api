@@ -131,6 +131,7 @@ exports.delete_kamar = async (req, res) => {
     Resp(res, "OK", "Success!", { success: true });
     return;
   } catch (error) {
+    console.log(error);
     Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
     return;
   }

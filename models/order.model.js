@@ -37,6 +37,8 @@ module.exports = (sequelize, Sequelize) => {
         model: "kamars", // Nama tabel terkait
         key: "id", // Primary key di tabel kamar
       },
+      onDelete: "CASCADE", // Menghapus orders terkait saat kamar dihapus
+      onUpdate: "CASCADE",
     },
     status_order: {
       type: Sequelize.STRING,

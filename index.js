@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
 // DATABASE
 db.sequelize
-  .sync()
+  .sync({ alter: true })
   .then(() => {
     console.log("Synced db.");
   })
@@ -39,7 +39,7 @@ app.use(router);
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Anggrek Inn 2 - v0.1" });
+  res.json({ message: "Anggrek Inn 2 - v0.2" });
 });
 
 // set port, listen for requests

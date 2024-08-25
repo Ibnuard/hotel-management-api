@@ -15,6 +15,7 @@ module.exports = (sequelize, Sequelize) => {
     TipeKamar.hasMany(models.kamar, {
       foreignKey: "tipe_kamar_id",
       as: "kamar",
+      onDelete: "CASCADE",
     });
   };
 
