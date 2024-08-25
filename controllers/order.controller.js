@@ -67,46 +67,33 @@ exports.get_checkout_kamar = async (req, res) => {
       status_order: "CHECKED_IN",
     };
 
-    const includeConditions = [];
-
     if (cari) {
-      includeConditions.push(
-        Sequelize.where(Sequelize.col("kamar.nama_kamar"), {
-          [Op.like]: `%${cari}%`,
-        })
-      );
-      includeConditions.push(
-        Sequelize.where(Sequelize.col("tamu.nama"), {
-          [Op.like]: `%${cari}%`,
-        })
-      );
-      includeConditions.push(
-        Sequelize.where(Sequelize.col("kamar.nomor_kamar"), {
-          [Op.like]: `%${cari}%`,
-        })
-      );
+      whereCondition[Op.or] = [
+        { "$kamar.nama_kamar$": { [Op.like]: `%${cari}%` } },
+        { "$kamar.nomor_kamar$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.nama_depan$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.nama_belakang$": { [Op.like]: `%${cari}%` } },
+        { "$tamu.alias$": { [Op.like]: `%${cari}%` } },
+      ];
     }
 
     const result = await order_db.findAndCountAll({
-      where: {
-        ...whereCondition,
-        [Op.and]: includeConditions,
-      },
+      where: whereCondition,
       limit: parseInt(limit),
       offset: parseInt(offset),
       include: [
         {
           model: kamar_db,
           as: "kamar",
-          required: false,
+          required: true, // Ensure the kamar table is always joined
         },
         {
           model: tamu_db,
           as: "tamu",
-          required: false,
+          required: true, // Ensure the tamu table is always joined
         },
       ],
-      required: false,
+      subQuery: false,
     });
 
     const totalPages = Math.ceil(result.count / limit);
