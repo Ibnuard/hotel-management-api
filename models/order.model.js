@@ -43,6 +43,9 @@ module.exports = (sequelize, Sequelize) => {
     status_order: {
       type: Sequelize.STRING,
     },
+    additional_service: {
+      type: Sequelize.JSON,
+    },
   });
 
   Order.associate = (models) => {
@@ -56,6 +59,14 @@ module.exports = (sequelize, Sequelize) => {
     Order.belongsTo(models.kamar, {
       foreignKey: "kamar_id",
       as: "kamar",
+    });
+
+    // Relasi dengan ProductKamar melalui OrderProduct
+    Order.belongsToMany(models.product, {
+      through: models.order_product, // Intermediary table
+      foreignKey: "order_id",
+      otherKey: "product_kamar_id",
+      as: "additional_services",
     });
   };
 

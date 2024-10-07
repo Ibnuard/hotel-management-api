@@ -10,6 +10,7 @@ const kamar = require("../controllers/kamar.controller");
 const tamu = require("../controllers/tamu.controller");
 const tipe_kamar = require("../controllers/tipekamar.controller");
 const order = require("../controllers/order.controller");
+const product = require("../controllers/product.controller");
 
 // method
 
@@ -51,6 +52,12 @@ router.post("/checkout/kamar/:id", order.checkout_kamar);
 // -- order
 router.get("/order/history", order.get_history);
 router.get("/order/checkout-today", order.get_in_house);
+
+// -- admin product
+router.post("/admin/product", product.add);
+router.post("/admin/product/:id", product.edit);
+router.get("/admin/product", product.get_all);
+router.delete("/admin/product/:id", product.delete);
 
 // -- inv
 router.post(
