@@ -52,6 +52,7 @@ router.post("/checkout/kamar/:id", order.checkout_kamar);
 // -- order
 router.get("/order/history", order.get_history);
 router.get("/order/checkout-today", order.get_in_house);
+router.post("/order/add-service/:id", order.add_product_service);
 
 // -- admin product
 router.post("/admin/product", product.add);

@@ -60,14 +60,6 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: "kamar_id",
       as: "kamar",
     });
-
-    // Relasi dengan ProductKamar melalui OrderProduct
-    Order.belongsToMany(models.product, {
-      through: models.order_product, // Intermediary table
-      foreignKey: "order_id",
-      otherKey: "product_kamar_id",
-      as: "additional_services",
-    });
   };
 
   return Order;

@@ -57,7 +57,7 @@ exports.get_all = async (req, res) => {
     const whereCondition = {};
 
     if (cari) {
-      whereCondition[Op.or] = [{ tipe: { [Op.like]: `%${cari}%` } }];
+      whereCondition[Op.or] = [{ nama_product: { [Op.like]: `%${cari}%` } }];
     }
 
     const result = await product_db.findAndCountAll({

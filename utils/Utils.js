@@ -24,7 +24,14 @@ function calculateDateDifference(startDate, endDate) {
   return differenceInDays;
 }
 
+const calculateTotalPrice = (items) => {
+  return items.reduce((total, item) => {
+    return total + item.total_price; // Menambahkan total_price setiap item ke total
+  }, 0); // Inisialisasi total dengan 0
+};
+
 module.exports = {
   extractNumberFromCurrency,
   calculateDateDifference,
+  calculateTotalPrice,
 };

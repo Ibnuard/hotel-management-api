@@ -14,15 +14,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  // Associations
-  ProductKamar.associate = (models) => {
-    ProductKamar.belongsToMany(models.order, {
-      through: models.order_product,
-      foreignKey: "product_kamar_id",
-      otherKey: "order_id",
-      as: "orders",
-    });
-  };
-
   return ProductKamar;
 };

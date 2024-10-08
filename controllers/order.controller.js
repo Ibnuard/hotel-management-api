@@ -7,12 +7,14 @@ const moment = require("moment");
 const {
   extractNumberFromCurrency,
   calculateDateDifference,
+  calculateTotalPrice,
 } = require("../utils/Utils");
 const order_db = db.order;
 const kamar_db = db.kamar;
 const tamu_db = db.tamu;
 const sa_db = db.sa;
 const tipe_kamar_db = db.tipe_kamar;
+const order_product_db = db.order_product;
 
 exports.checkin_order = async (req, res) => {
   const {
@@ -135,6 +137,7 @@ exports.get_order_detail = async (req, res) => {
       ],
     });
     const getOrderData = await getOrder["dataValues"];
+    const addOns = getOrderData["additional_service"];
 
     // kamar
     const tipeKamarId = getOrderData["kamar"].tipe_kamar_id;
@@ -158,7 +161,8 @@ exports.get_order_detail = async (req, res) => {
     const harga = extractNumberFromCurrency(getOrderData["kamar"].harga);
     const deposit = extractNumberFromCurrency(getOrderData.jumlah_deposit);
 
-    const subtotal = harga * diffDate;
+    const addOnsTotal = calculateTotalPrice(addOns);
+    const subtotal = harga * diffDate + addOnsTotal;
     const ppn = Math.round((subtotal * 11) / 100);
 
     const grandTotal = subtotal + ppn - deposit;
@@ -170,6 +174,7 @@ exports.get_order_detail = async (req, res) => {
       subtotal: subtotal,
       ppn: ppn,
       deposit: deposit,
+      addOns: addOns,
       grandTotal: grandTotal,
     });
     return;
@@ -440,6 +445,23 @@ exports.send_invoice_to_email = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.add_product_service = async (req, res) => {
+  const { id } = req.params;
+  const { addOns } = req.body;
+  try {
+    await order_db.update(
+      { additional_service: addOns },
+      { where: { id: id } }
+    );
+
+    Resp(res, "OK", "Success!", { success: true });
+    return;
+  } catch (error) {
     Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
     return;
   }
