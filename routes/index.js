@@ -11,6 +11,7 @@ const tamu = require("../controllers/tamu.controller");
 const tipe_kamar = require("../controllers/tipekamar.controller");
 const order = require("../controllers/order.controller");
 const product = require("../controllers/product.controller");
+const paket = require("../controllers/paket.controller");
 
 // method
 
@@ -59,6 +60,12 @@ router.post("/admin/product", product.add);
 router.post("/admin/product/:id", product.edit);
 router.get("/admin/product", product.get_all);
 router.delete("/admin/product/:id", product.delete);
+
+// -- paket aula
+router.post("/aula/paket", paket.add);
+router.post("/aula/paket/:id", paket.edit);
+router.get("/aula/paket", paket.get_all);
+router.delete("/aula/paket/:id", paket.delete);
 
 // -- inv
 router.post(
