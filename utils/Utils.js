@@ -30,8 +30,21 @@ const calculateTotalPrice = (items) => {
   }, 0); // Inisialisasi total dengan 0
 };
 
+const parseCurrency = (formatted) => {
+  if (!formatted) return "0";
+
+  // Remove the 'Rp ' prefix and any dot separators
+  let cleanNum = formatted.replace(/[Rp\s.]/g, "");
+
+  // If the cleaned number is empty, reset to "0"
+  if (cleanNum === "") cleanNum = "0";
+
+  return cleanNum;
+};
+
 module.exports = {
   extractNumberFromCurrency,
   calculateDateDifference,
   calculateTotalPrice,
+  parseCurrency,
 };

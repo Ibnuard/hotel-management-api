@@ -12,6 +12,7 @@ const tipe_kamar = require("../controllers/tipekamar.controller");
 const order = require("../controllers/order.controller");
 const product = require("../controllers/product.controller");
 const paket = require("../controllers/paket.controller");
+const aula = require("../controllers/aula.controller");
 
 // method
 
@@ -66,6 +67,12 @@ router.post("/aula/paket", paket.add);
 router.post("/aula/paket/:id", paket.edit);
 router.get("/aula/paket", paket.get_all);
 router.delete("/aula/paket/:id", paket.delete);
+
+// -- aula
+router.post("/aula/sewa", aula.create_sewa);
+router.post("/aula/sewa/:id", aula.edit_sewa);
+router.get("/aula/sewa", aula.get_sewa);
+router.delete("/aula/sewa/:id", aula.delete_sewa);
 
 // -- inv
 router.post(

@@ -14,7 +14,6 @@ const kamar_db = db.kamar;
 const tamu_db = db.tamu;
 const sa_db = db.sa;
 const tipe_kamar_db = db.tipe_kamar;
-const order_product_db = db.order_product;
 
 exports.checkin_order = async (req, res) => {
   const {

@@ -27,6 +27,7 @@ db.tipe_kamar = require("../models/tipe.model.js")(sequelize, Sequelize);
 db.order = require("../models/order.model.js")(sequelize, Sequelize);
 db.product = require("../models/product.model.js")(sequelize, Sequelize);
 db.paket = require("../models/paket.model.js")(sequelize, Sequelize);
+db.aula = require("../models/aula.model.js")(sequelize, Sequelize);
 
 // Setup associations
 Object.keys(db).forEach((modelName) => {
