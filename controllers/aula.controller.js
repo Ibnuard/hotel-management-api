@@ -177,7 +177,7 @@ exports.check_sewa = async (req, res) => {
     const start = moment(startDate, "YYYY-MM-DD");
     const end = moment(endDate, "YYYY-MM-DD");
 
-    const conflictingBookings = await Aula.findAll({
+    const conflictingBookings = await aula_db.findAll({
       where: {
         [Op.or]: [
           {
@@ -225,6 +225,7 @@ exports.check_sewa = async (req, res) => {
     Resp(res, "OK", "Success!", { success: true });
     return;
   } catch (error) {
+    console.log(error);
     Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
     return;
   }

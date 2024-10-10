@@ -73,6 +73,7 @@ router.post("/aula/sewa", aula.create_sewa);
 router.post("/aula/sewa/:id", aula.edit_sewa);
 router.get("/aula/sewa", aula.get_sewa);
 router.delete("/aula/sewa/:id", aula.delete_sewa);
+router.post("/aula/check", aula.check_sewa);
 
 // -- inv
 router.post(
