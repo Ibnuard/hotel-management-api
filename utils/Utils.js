@@ -42,9 +42,21 @@ const parseCurrency = (formatted) => {
   return cleanNum;
 };
 
+function getDayDiff(tanggalMulai, tanggalSelesai) {
+  // Parse tanggal dengan format YYYY-MM-DD
+  const mulai = moment(tanggalMulai, "YYYY-MM-DD");
+  const selesai = moment(tanggalSelesai, "YYYY-MM-DD");
+
+  // Hitung selisih hari
+  const lamaHari = selesai.diff(mulai, "days");
+
+  return lamaHari;
+}
+
 module.exports = {
   extractNumberFromCurrency,
   calculateDateDifference,
   calculateTotalPrice,
   parseCurrency,
+  getDayDiff,
 };

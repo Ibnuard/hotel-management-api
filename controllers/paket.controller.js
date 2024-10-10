@@ -98,3 +98,23 @@ exports.delete = async (req, res) => {
     return;
   }
 };
+
+exports.get_by_id = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getData = await paket_db.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    const getPaketData = await getData["dataValues"];
+
+    Resp(res, "OK", "Success!", getPaketData);
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};

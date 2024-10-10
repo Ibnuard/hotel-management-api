@@ -2,14 +2,21 @@ const { Op } = require("sequelize");
 const db = require("../db");
 const { ERROR_MESSAGE_GENERAL } = require("../utils/Constants");
 const { Resp } = require("../utils/Resp");
-const { parseCurrency } = require("../utils/Utils");
+const { parseCurrency, getDayDiff } = require("../utils/Utils");
 const moment = require("moment");
 const aula_db = db.aula;
 const paket_db = db.paket;
+const sa_db = db.sa;
 
 exports.create_sewa = async (req, res) => {
-  const { penyewa, tgl_awal_sewa, tgl_akhir_sewa, paket_id, jumlah_pax } =
-    req.body;
+  const {
+    penyewa,
+    tgl_awal_sewa,
+    tgl_akhir_sewa,
+    paket_id,
+    harga_paket,
+    jumlah_pax,
+  } = req.body;
 
   try {
     const currentDate = moment(new Date()).format("YYYYMMDD");
@@ -17,33 +24,33 @@ exports.create_sewa = async (req, res) => {
 
     const INVOICE = `INV-AGRK2-AULA-${currentDate}-${randomDigits}`;
 
-    // -- Get paket
-    const getPaket = await paket_db.findOne({
-      where: {
-        id: paket_id,
-      },
+    const paketPrice = harga_paket;
+
+    // get aula price
+    const getAula = await sa_db.findOne({
+      where: { id: 1 },
+      attributes: ["aula_price"],
     });
 
-    if (!getPaket) {
-      Resp(res, "ERROR", "Paket tidak ditemukan", []);
-      return;
-    }
-
-    const getPaketData = await getPaket["dataValues"];
-    const paketPrice = getPaketData.harga_paket;
+    const getAulaData = await getAula["dataValues"];
 
     // -- handle price
-    const totalPaketPrice =
-      parseInt(parseCurrency(paketPrice)) * jumlah_pax * 1500000;
+    const totalPaket =
+      paket_id == 1 ? parseInt(paketPrice) : parseInt(paketPrice) * jumlah_pax;
+    const totalPriceAula =
+      parseInt(getAulaData.aula_price) *
+      parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
+    const totalPrice = totalPaket + totalPriceAula;
 
-    const ppn = (11 / 100) * totalPaketPrice;
+    const ppn = (11 / 100) * totalPrice;
 
-    const finalPrice = totalPaketPrice + ppn;
+    const finalPrice = totalPrice + ppn;
 
     // -- create data
     await aula_db.create({
-      invoice: INVOICE,
+      invoice_id: INVOICE,
       penyewa,
+      nama_penyewa: penyewa.name,
       tgl_awal_sewa,
       tgl_akhir_sewa,
       paket_id,
@@ -62,33 +69,38 @@ exports.create_sewa = async (req, res) => {
 };
 
 exports.edit_sewa = async (req, res) => {
-  const { penyewa, tgl_awal_sewa, tgl_akhir_sewa, paket_id, jumlah_pax } =
-    req.body;
+  const {
+    penyewa,
+    tgl_awal_sewa,
+    tgl_akhir_sewa,
+    paket_id,
+    jumlah_pax,
+    harga_paket,
+  } = req.body;
   const { id } = req.params;
 
   try {
-    // -- Get paket
-    const getPaket = await paket_db.findOne({
-      where: {
-        id: paket_id,
-      },
+    const paketPrice = harga_paket;
+
+    // get aula price
+    const getAula = await sa_db.findOne({
+      where: { id: 1 },
+      attributes: ["aula_price"],
     });
 
-    if (!getPaket) {
-      Resp(res, "ERROR", "Paket tidak ditemukan", []);
-      return;
-    }
-
-    const getPaketData = await getPaket["dataValues"];
-    const paketPrice = getPaketData.harga_paket;
+    const getAulaData = await getAula["dataValues"];
 
     // -- handle price
-    const totalPaketPrice =
-      parseInt(parseCurrency(paketPrice)) * jumlah_pax * 1500000;
+    const totalPaket =
+      paket_id == 1 ? parseInt(paketPrice) : parseInt(paketPrice) * jumlah_pax;
+    const totalPriceAula =
+      parseInt(getAulaData.aula_price) *
+      parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
+    const totalPrice = totalPaket + totalPriceAula;
 
-    const ppn = (11 / 100) * totalPaketPrice;
+    const ppn = (11 / 100) * totalPrice;
 
-    const finalPrice = totalPaketPrice + ppn;
+    const finalPrice = totalPrice + ppn;
 
     // -- create data
     await aula_db.update(

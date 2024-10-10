@@ -17,6 +17,9 @@ module.exports = (sequelize, Sequelize) => {
       email_password: {
         type: Sequelize.STRING,
       },
+      aula_price: {
+        type: Sequelize.STRING,
+      },
     },
     {
       timestamps: false,

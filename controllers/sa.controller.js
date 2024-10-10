@@ -70,3 +70,22 @@ exports.update_sa = async (req, res) => {
     return;
   }
 };
+
+exports.get_aula_price = async (req, res) => {
+  try {
+    const getData = await sa_db.findOne({
+      where: {
+        id: 1,
+      },
+      attributes: ["aula_price"],
+    });
+
+    const getPriceData = await getData["dataValues"];
+
+    Resp(res, "OK", "Success!", getPriceData);
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
