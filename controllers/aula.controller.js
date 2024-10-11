@@ -33,13 +33,13 @@ exports.create_sewa = async (req, res) => {
     });
 
     const getAulaData = await getAula["dataValues"];
+    const aulaPrice = getAulaData.aula_price;
 
     // -- handle price
     const totalPaket =
       paket_id == 1 ? parseInt(paketPrice) : parseInt(paketPrice) * jumlah_pax;
     const totalPriceAula =
-      parseInt(getAulaData.aula_price) *
-      parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
+      parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
     const totalPrice = totalPaket + totalPriceAula;
 
     const ppn = (11 / 100) * totalPrice;
@@ -54,6 +54,7 @@ exports.create_sewa = async (req, res) => {
       tgl_awal_sewa,
       tgl_akhir_sewa,
       paket_id,
+      harga_aula: aulaPrice,
       harga_paket: paketPrice,
       jumlah_pax,
       total_harga: finalPrice,
@@ -89,13 +90,13 @@ exports.edit_sewa = async (req, res) => {
     });
 
     const getAulaData = await getAula["dataValues"];
+    const aulaPrice = getAulaData.aula_price;
 
     // -- handle price
     const totalPaket =
       paket_id == 1 ? parseInt(paketPrice) : parseInt(paketPrice) * jumlah_pax;
     const totalPriceAula =
-      parseInt(getAulaData.aula_price) *
-      parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
+      parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
     const totalPrice = totalPaket + totalPriceAula;
 
     const ppn = (11 / 100) * totalPrice;
@@ -109,6 +110,7 @@ exports.edit_sewa = async (req, res) => {
         tgl_awal_sewa,
         tgl_akhir_sewa,
         paket_id,
+        harga_aula: aulaPrice,
         harga_paket: paketPrice,
         jumlah_pax,
         total_harga: finalPrice,
@@ -163,6 +165,7 @@ exports.get_sewa = async (req, res) => {
         },
       ],
       subQuery: false,
+      order: [["createdAt", "DESC"]],
     });
 
     const totalPages = Math.ceil(result.count / limit);
@@ -191,6 +194,7 @@ exports.check_sewa = async (req, res) => {
 
     const conflictingBookings = await aula_db.findAll({
       where: {
+        status_sewa: "BOOKED",
         [Op.or]: [
           {
             // Cek jika tgl_awal_sewa berada di dalam rentang tanggal yang diberikan
@@ -235,6 +239,57 @@ exports.check_sewa = async (req, res) => {
     }
 
     Resp(res, "OK", "Success!", { success: true });
+    return;
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.update_status = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getExt = await aula_db.findOne({ where: { id: id } });
+    const getExtData = await getExt["dataValues"];
+    const extOrderStatus = getExtData.status_sewa;
+
+    if (extOrderStatus == "BOOKED") {
+      await aula_db.update({ status_sewa: "DONE" }, { where: { id: id } });
+    }
+
+    Resp(res, "OK", "Success!", { success: true });
+    return;
+  } catch (error) {
+    console.log(error);
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.get_status = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getExt = await aula_db.findOne({ where: { id: id } });
+    const getExtData = await getExt["dataValues"];
+    const extOrderStatus = getExtData.status_sewa;
+
+    Resp(res, "OK", "Success!", { status: extOrderStatus });
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.update_aula_price = async (req, res) => {
+  const { price } = req.body;
+  try {
+    await sa_db.update({ aula_price: price }, { where: { id: 1 } });
+
+    Resp(res, "OK", "Success!", { status: true });
     return;
   } catch (error) {
     console.log(error);

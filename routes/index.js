@@ -76,6 +76,9 @@ router.get("/aula/sewa", aula.get_sewa);
 router.delete("/aula/sewa/:id", aula.delete_sewa);
 router.post("/aula/check", aula.check_sewa);
 router.get("/aula/price", sa.get_aula_price);
+router.post("/aula/status/:id", aula.update_status);
+router.get("/aula/status/:id", aula.get_status);
+router.post("/aula/price", aula.update_aula_price);
 
 // -- inv
 router.post(
