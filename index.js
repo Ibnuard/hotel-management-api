@@ -39,7 +39,7 @@ app.use(router);
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Anggrek Inn 2 - v0.2" });
+  res.json({ message: "Anggrek Inn 2 - v1.2" });
 });
 
 // set port, listen for requests

@@ -25,6 +25,7 @@ function calculateDateDifference(startDate, endDate) {
 }
 
 const calculateTotalPrice = (items) => {
+  if (!items) return 0;
   return items.reduce((total, item) => {
     return total + item.total_price; // Menambahkan total_price setiap item ke total
   }, 0); // Inisialisasi total dengan 0
