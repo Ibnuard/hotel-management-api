@@ -42,10 +42,6 @@ exports.create_sewa = async (req, res) => {
       parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
     const totalPrice = totalPaket + totalPriceAula;
 
-    const ppn = (11 / 100) * totalPrice;
-
-    const finalPrice = totalPrice + ppn;
-
     // -- create data
     await aula_db.create({
       invoice_id: INVOICE,
@@ -57,7 +53,7 @@ exports.create_sewa = async (req, res) => {
       harga_aula: aulaPrice,
       harga_paket: paketPrice,
       jumlah_pax,
-      total_harga: finalPrice,
+      total_harga: totalPrice,
       status_sewa: "BOOKED",
     });
 
@@ -99,10 +95,6 @@ exports.edit_sewa = async (req, res) => {
       parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
     const totalPrice = totalPaket + totalPriceAula;
 
-    const ppn = (11 / 100) * totalPrice;
-
-    const finalPrice = totalPrice + ppn;
-
     // -- create data
     await aula_db.update(
       {
@@ -113,7 +105,7 @@ exports.edit_sewa = async (req, res) => {
         harga_aula: aulaPrice,
         harga_paket: paketPrice,
         jumlah_pax,
-        total_harga: finalPrice,
+        total_harga: totalPrice,
         status_sewa: "BOOKED",
       },
       { where: { id: id } }

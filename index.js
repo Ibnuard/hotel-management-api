@@ -39,7 +39,7 @@ app.use(router);
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Anggrek Inn 2 - v1.2" });
+  res.json({ message: "Anggrek Inn 2 - v1.2.4 - Remove Aula PPN" });
 });
 
 // set port, listen for requests
