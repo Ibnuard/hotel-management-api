@@ -21,9 +21,6 @@ module.exports = (sequelize, Sequelize) => {
     harga_aula: {
       type: Sequelize.STRING,
     },
-    jumlah_pax: {
-      type: Sequelize.INTEGER,
-    },
     total_harga: {
       type: Sequelize.INTEGER,
     },

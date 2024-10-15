@@ -28,38 +28,15 @@ exports.create_sewa = async (req, res) => {
     const aulaPrice = getAulaData.aula_price;
 
     // calculate paket price
-    let totalPaketPrice = 0;
-
-    const ext = paket_list;
-    const filtered = ext.filter((item) => item.id !== 1);
-    const mapFormated = filtered.map((item) => {
-      return {
-        ...item,
-        harga_paket:
-          parseInt(parseCurrency(item.harga_paket)) * parseInt(jumlah_pax),
-      };
-    });
-
-    const isHasPrasmanan = ext.find((item) => item.id == 1);
-
-    const extTotalPaket = mapFormated.reduce(
-      (acc, item) => acc + item.harga_paket,
+    const extTotalPaket = paket_list.reduce(
+      (acc, item) => acc + item.total_price,
       0
     );
-
-    if (isHasPrasmanan) {
-      const hargaPrasmanan = parseCurrency(isHasPrasmanan.harga_paket);
-      const totalFinal = parseInt(extTotalPaket) + parseInt(hargaPrasmanan);
-
-      totalPaketPrice = totalFinal;
-    } else {
-      totalPaketPrice = extTotalPaket;
-    }
 
     // -- handle price
     const totalPriceAula =
       parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
-    const totalPrice = totalPaketPrice + totalPriceAula;
+    const totalPrice = extTotalPaket + totalPriceAula;
 
     // -- create data
     await aula_db.create({
@@ -70,7 +47,6 @@ exports.create_sewa = async (req, res) => {
       tgl_akhir_sewa,
       harga_aula: aulaPrice,
       paket_list: paket_list,
-      jumlah_pax,
       total_harga: totalPrice,
       status_sewa: "BOOKED",
     });
@@ -84,8 +60,7 @@ exports.create_sewa = async (req, res) => {
 };
 
 exports.edit_sewa = async (req, res) => {
-  const { penyewa, tgl_awal_sewa, tgl_akhir_sewa, paket_list, jumlah_pax } =
-    req.body;
+  const { penyewa, tgl_awal_sewa, tgl_akhir_sewa, paket_list } = req.body;
   const { id } = req.params;
 
   try {
@@ -99,38 +74,15 @@ exports.edit_sewa = async (req, res) => {
     const aulaPrice = getAulaData.aula_price;
 
     // calculate paket price
-    let totalPaketPrice = 0;
-
-    const ext = paket_list;
-    const filtered = ext.filter((item) => item.id !== 1);
-    const mapFormated = filtered.map((item) => {
-      return {
-        ...item,
-        harga_paket:
-          parseInt(parseCurrency(item.harga_paket)) * parseInt(jumlah_pax),
-      };
-    });
-
-    const isHasPrasmanan = ext.find((item) => item.id == 1);
-
-    const extTotalPaket = mapFormated.reduce(
-      (acc, item) => acc + item.harga_paket,
+    const extTotalPaket = paket_list.reduce(
+      (acc, item) => acc + item.total_price,
       0
     );
-
-    if (isHasPrasmanan) {
-      const hargaPrasmanan = parseCurrency(isHasPrasmanan.harga_paket);
-      const totalFinal = parseInt(extTotalPaket) + parseInt(hargaPrasmanan);
-
-      totalPaketPrice = totalFinal;
-    } else {
-      totalPaketPrice = extTotalPaket;
-    }
 
     // -- handle price
     const totalPriceAula =
       parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
-    const totalPrice = totalPaketPrice + totalPriceAula;
+    const totalPrice = extTotalPaket + totalPriceAula;
 
     // -- create data
     await aula_db.update(
@@ -140,8 +92,7 @@ exports.edit_sewa = async (req, res) => {
         tgl_akhir_sewa,
         harga_aula: aulaPrice,
         paket_list: paket_list,
-        jumlah_pax,
-        total_harga: totalPrice,
+        total_harga: parseInt(totalPrice),
         status_sewa: "BOOKED",
       },
       { where: { id: id } }
@@ -150,6 +101,7 @@ exports.edit_sewa = async (req, res) => {
     Resp(res, "OK", "success!", { success: true });
     return;
   } catch (error) {
+    console.log(error);
     Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
     return;
   }

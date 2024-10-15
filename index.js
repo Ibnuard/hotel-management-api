@@ -40,7 +40,7 @@ app.use(router);
 // simple route
 app.get("/", (req, res) => {
   res.json({
-    message: "Anggrek Inn 2 - v1.2.6 - Revisi paket aula dan alamat",
+    message: "Anggrek Inn 2 - v1.2.7 - Revisi paket aula selection",
   });
 });
 
