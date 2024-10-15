@@ -80,6 +80,10 @@ router.post("/aula/status/:id", aula.update_status);
 router.get("/aula/status/:id", aula.get_status);
 router.post("/aula/price", aula.update_aula_price);
 
+// other
+router.get("/admin/address", sa.get_address);
+router.post("/admin/address", sa.update_address);
+
 // -- inv
 router.post(
   "/order/invoice/send",

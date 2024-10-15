@@ -15,17 +15,8 @@ module.exports = (sequelize, Sequelize) => {
     tgl_akhir_sewa: {
       type: Sequelize.STRING,
     },
-    paket_id: {
-      type: Sequelize.INTEGER,
-      references: {
-        model: "paket_aulas", // Nama tabel terkait
-        key: "id", // Primary key di tabel kamar
-      },
-      onDelete: "CASCADE", // Menghapus orders terkait saat kamar dihapus
-      onUpdate: "CASCADE",
-    },
-    harga_paket: {
-      type: Sequelize.STRING,
+    paket_list: {
+      type: Sequelize.JSON,
     },
     harga_aula: {
       type: Sequelize.STRING,
@@ -40,14 +31,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
     },
   });
-
-  Aula.associate = (models) => {
-    // Relasi dengan model Kamar
-    Aula.belongsTo(models.paket, {
-      foreignKey: "paket_id",
-      as: "paket",
-    });
-  };
 
   return Aula;
 };

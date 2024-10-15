@@ -228,6 +228,8 @@ exports.update_order = async (req, res) => {
     jumlah_deposit,
     tgl_checkout,
     waktu_checkout,
+    tgl_checkin,
+    waktu_checkin,
   } = req.body;
 
   const { id } = req.params;
@@ -239,6 +241,8 @@ exports.update_order = async (req, res) => {
         jumlah_deposit,
         tgl_checkout,
         waktu_checkout,
+        tgl_checkin,
+        waktu_checkin,
       },
       { where: { id: id } }
     );

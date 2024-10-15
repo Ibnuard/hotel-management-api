@@ -9,22 +9,14 @@ const paket_db = db.paket;
 const sa_db = db.sa;
 
 exports.create_sewa = async (req, res) => {
-  const {
-    penyewa,
-    tgl_awal_sewa,
-    tgl_akhir_sewa,
-    paket_id,
-    harga_paket,
-    jumlah_pax,
-  } = req.body;
+  const { penyewa, tgl_awal_sewa, tgl_akhir_sewa, paket_list, jumlah_pax } =
+    req.body;
 
   try {
     const currentDate = moment(new Date()).format("YYYYMMDD");
     const randomDigits = Math.floor(10000 + Math.random() * 90000); // Ensures it is a 5-digit number
 
     const INVOICE = `INV-AGRK2-AULA-${currentDate}-${randomDigits}`;
-
-    const paketPrice = harga_paket;
 
     // get aula price
     const getAula = await sa_db.findOne({
@@ -35,12 +27,39 @@ exports.create_sewa = async (req, res) => {
     const getAulaData = await getAula["dataValues"];
     const aulaPrice = getAulaData.aula_price;
 
+    // calculate paket price
+    let totalPaketPrice = 0;
+
+    const ext = paket_list;
+    const filtered = ext.filter((item) => item.id !== 1);
+    const mapFormated = filtered.map((item) => {
+      return {
+        ...item,
+        harga_paket:
+          parseInt(parseCurrency(item.harga_paket)) * parseInt(jumlah_pax),
+      };
+    });
+
+    const isHasPrasmanan = ext.find((item) => item.id == 1);
+
+    const extTotalPaket = mapFormated.reduce(
+      (acc, item) => acc + item.harga_paket,
+      0
+    );
+
+    if (isHasPrasmanan) {
+      const hargaPrasmanan = parseCurrency(isHasPrasmanan.harga_paket);
+      const totalFinal = parseInt(extTotalPaket) + parseInt(hargaPrasmanan);
+
+      totalPaketPrice = totalFinal;
+    } else {
+      totalPaketPrice = extTotalPaket;
+    }
+
     // -- handle price
-    const totalPaket =
-      paket_id == 1 ? parseInt(paketPrice) : parseInt(paketPrice) * jumlah_pax;
     const totalPriceAula =
       parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
-    const totalPrice = totalPaket + totalPriceAula;
+    const totalPrice = totalPaketPrice + totalPriceAula;
 
     // -- create data
     await aula_db.create({
@@ -49,9 +68,8 @@ exports.create_sewa = async (req, res) => {
       nama_penyewa: penyewa.name,
       tgl_awal_sewa,
       tgl_akhir_sewa,
-      paket_id,
       harga_aula: aulaPrice,
-      harga_paket: paketPrice,
+      paket_list: paket_list,
       jumlah_pax,
       total_harga: totalPrice,
       status_sewa: "BOOKED",
@@ -66,19 +84,11 @@ exports.create_sewa = async (req, res) => {
 };
 
 exports.edit_sewa = async (req, res) => {
-  const {
-    penyewa,
-    tgl_awal_sewa,
-    tgl_akhir_sewa,
-    paket_id,
-    jumlah_pax,
-    harga_paket,
-  } = req.body;
+  const { penyewa, tgl_awal_sewa, tgl_akhir_sewa, paket_list, jumlah_pax } =
+    req.body;
   const { id } = req.params;
 
   try {
-    const paketPrice = harga_paket;
-
     // get aula price
     const getAula = await sa_db.findOne({
       where: { id: 1 },
@@ -88,12 +98,39 @@ exports.edit_sewa = async (req, res) => {
     const getAulaData = await getAula["dataValues"];
     const aulaPrice = getAulaData.aula_price;
 
+    // calculate paket price
+    let totalPaketPrice = 0;
+
+    const ext = paket_list;
+    const filtered = ext.filter((item) => item.id !== 1);
+    const mapFormated = filtered.map((item) => {
+      return {
+        ...item,
+        harga_paket:
+          parseInt(parseCurrency(item.harga_paket)) * parseInt(jumlah_pax),
+      };
+    });
+
+    const isHasPrasmanan = ext.find((item) => item.id == 1);
+
+    const extTotalPaket = mapFormated.reduce(
+      (acc, item) => acc + item.harga_paket,
+      0
+    );
+
+    if (isHasPrasmanan) {
+      const hargaPrasmanan = parseCurrency(isHasPrasmanan.harga_paket);
+      const totalFinal = parseInt(extTotalPaket) + parseInt(hargaPrasmanan);
+
+      totalPaketPrice = totalFinal;
+    } else {
+      totalPaketPrice = extTotalPaket;
+    }
+
     // -- handle price
-    const totalPaket =
-      paket_id == 1 ? parseInt(paketPrice) : parseInt(paketPrice) * jumlah_pax;
     const totalPriceAula =
       parseInt(aulaPrice) * parseInt(getDayDiff(tgl_awal_sewa, tgl_akhir_sewa));
-    const totalPrice = totalPaket + totalPriceAula;
+    const totalPrice = totalPaketPrice + totalPriceAula;
 
     // -- create data
     await aula_db.update(
@@ -101,9 +138,8 @@ exports.edit_sewa = async (req, res) => {
         penyewa,
         tgl_awal_sewa,
         tgl_akhir_sewa,
-        paket_id,
         harga_aula: aulaPrice,
-        harga_paket: paketPrice,
+        paket_list: paket_list,
         jumlah_pax,
         total_harga: totalPrice,
         status_sewa: "BOOKED",
@@ -149,14 +185,6 @@ exports.get_sewa = async (req, res) => {
       where: whereCondition,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      include: [
-        {
-          model: paket_db,
-          as: "paket",
-          required: true, // Ensure the kamar table is always joined
-        },
-      ],
-      subQuery: false,
       order: [["createdAt", "DESC"]],
     });
 

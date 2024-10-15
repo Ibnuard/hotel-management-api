@@ -89,3 +89,32 @@ exports.get_aula_price = async (req, res) => {
     return;
   }
 };
+
+exports.get_address = async (req, res) => {
+  try {
+    const getData = await sa_db.findOne({
+      where: { id: 1 },
+      attributes: ["address"],
+    });
+    const getDataAddress = await getData["dataValues"];
+
+    Resp(res, "OK", "Success!", getDataAddress);
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};
+
+exports.update_address = async (req, res) => {
+  const { address } = req.body;
+  try {
+    await sa_db.update({ address }, { where: { id: 1 } });
+
+    Resp(res, "OK", "Success!", { success: true });
+    return;
+  } catch (error) {
+    Resp(res, "ERROR", ERROR_MESSAGE_GENERAL, []);
+    return;
+  }
+};

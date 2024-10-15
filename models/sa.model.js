@@ -20,6 +20,9 @@ module.exports = (sequelize, Sequelize) => {
       aula_price: {
         type: Sequelize.STRING,
       },
+      address: {
+        type: Sequelize.STRING,
+      },
     },
     {
       timestamps: false,
